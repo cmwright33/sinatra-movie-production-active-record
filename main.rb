@@ -1,9 +1,11 @@
 require 'pg'
 require 'sinatra'
 require 'sinatra/reloader' if development?
+require 'sinatra/activerecord'
+require 'rake'
+require 'pry'
 
-
-set :database {adapter: "postgresql",
+set :database, {adapter: "postgresql",
                 database: "movie_production2",
                 host: "localhost"}
 
@@ -38,26 +40,26 @@ end
 
 # gets all the tasks
 get '/todos' do
-  @todos = Todos.all
+  @todos = Todo.all
 erb :todos
 end
 
 # gives each individual task
 
 get '/todo/:id' do
-  @todo = Todos.find(params[:id])
+  @todo = Todo.find(params[:id])
 erb :todo
 end
 
 # goes to the edit task
-get '/edit_todo/:id/' do
-  @todo = Todos.find(params[:id])
+get '/todo/:id/edit' do
+  @todo = Todo.find(params[:id])
 erb :edit_todo
 end
 
 # posts the update back
-post '/edit_todo/:id/' do
-  todo = Todos.find(params[:id])
+post '/todo/:id' do
+  todo = Todo.find(params[:id])
   todo.task = params[:task]
   todo.task_description = params[:task_description]
   todo.movie_id = params[:movie_id]
@@ -70,13 +72,13 @@ end
 # create and assign new todo
 get '/create_todo' do
   @people = People.find(params[:id])
-  @movies = Movies.find(params[:id])
+  @movies = Movie.find(params[:id])
   erb :create_todo
 end
 
 # posts the task back to
 post '/create_todo' do
-  todo = Todos.create(params)
+  todo = Todo.create(params)
   redirect to "/todo/#{guitar.id}"
   erb :todos
 end
@@ -104,13 +106,13 @@ end
 
 
  # gives you the person information to edit
- get '/edit_person/:id' do
+ get '/person/:id/edit' do
 
   @people = People.find(params[:id])
  end
 
 #  posts the edits back to person
-post '/edit_person/:id' do
+post '/person/:id' do
   people = People.find(params[:id])
   people.name = params[:name]
   people.occupation = params[:occupation]
@@ -139,14 +141,14 @@ end
 # gets the movie
 
 get '/movies' do
-  movie = Movies.all
+  movie = Movie.all
   erb :movies
 end
 
 # gets single movie with information
 
 get '/movie/:id' do
-  movie = Movies.find(params[:id])
+  movie = Movie.find(params[:id])
   erb :movie
 end
 
@@ -157,16 +159,16 @@ end
 
 # posts the person back to people
 post '/create_movie' do
-  movie = Movies.create(params)
+  movie = Movie.create(params)
 end
 
-get '/edit_movie/:id' do
-  movie = Movies.find(parm[:id])
+get '/movie/:id/edit' do
+  movie = Movie.find(parm[:id])
 erb :edit_movie
 end
 
-post '/edit_movie/:id' do
-  movie = Movies.find(params[:id])
+post '/movie/:id' do
+  movie = Movie.find(params[:id])
   movie.movie_name = params[:movie_name]
   movie.release_date = params[:release_date]
   movie.director = params[:director]
